@@ -1,23 +1,158 @@
 /**
- * This class contains unit tests for validating the behavior of Apex classes
- * and triggers.
+ * =========================================================
+ * TEST DATA FACTORY
+ * =========================================================
  *
- * Unit tests are class methods that verify whether a particular piece
- * of code is working properly. Unit test methods take no arguments,
- * commit no data to the database, and are flagged with the testMethod
- * keyword in the method definition.
+ * Centralized test data utility class used to generate reusable,
+ * consistent, and maintainable test records across Apex unit tests.
  *
- * All test methods in an org are executed whenever Apex code is deployed
- * to a production org to confirm correctness, ensure code
- * coverage, and prevent regressions. All Apex classes are
- * required to have at least 75% code coverage in order to be deployed
- * to a production org. In addition, all triggers must have some code coverage.
- * 
- * The @isTest class annotation indicates this class only contains test
- * methods. Classes defined with the @isTest annotation do not count against
- * the org size limit for all Apex scripts.
+ * This factory supports creation of:
+ * - Accounts
+ * - Contacts
+ * - Employees
+ * - Claims
+ * - Employee Claim junction records
+ * - Risk scoring scenarios
+ * - Bulk testing datasets
+ * - Edge case and invalid records
  *
- * See the Apex Language Reference for more information about Testing and Code Coverage.
+ * ---------------------------------------------------------
+ * PURPOSE
+ * ---------------------------------------------------------
+ *
+ * TestDataFactory reduces duplicate setup logic inside test
+ * classes by providing reusable helper methods for generating
+ * common testing scenarios.
+ *
+ * Benefits include:
+ * - Cleaner test classes
+ * - Consistent test data creation
+ * - Easier maintenance
+ * - Reduced code duplication
+ * - Improved readability
+ * - Faster test development
+ *
+ * ---------------------------------------------------------
+ * DESIGN PRINCIPLES
+ * ---------------------------------------------------------
+ *
+ * This factory follows Salesforce Apex testing best practices:
+ *
+ * - Methods return records without automatically inserting
+ *   unless explicitly required for relationship setup.
+ *
+ * - Helper methods are grouped by functional domain:
+ *      * Core objects
+ *      * Claim scenarios
+ *      * Risk scenarios
+ *      * Bulk testing
+ *      * Edge cases
+ *
+ * - Scenario-based helpers provide realistic business cases
+ *   used across trigger and service-layer tests.
+ *
+ * ---------------------------------------------------------
+ * INSERTION STRATEGY
+ * ---------------------------------------------------------
+ *
+ * Most methods return NON-INSERTED sObjects so test methods
+ * can control:
+ * - DML timing
+ * - governor limit usage
+ * - transaction scope
+ * - bulk testing behavior
+ *
+ * Some helper methods intentionally perform inserts when:
+ * - relationship IDs are required
+ * - complete scenarios must exist in database state
+ * - junction records depend on persisted parents
+ *
+ * ---------------------------------------------------------
+ * MAJOR TESTING SCENARIOS SUPPORTED
+ * ---------------------------------------------------------
+ *
+ * EMPLOYEE TESTING
+ * - Standard employees
+ * - High-risk employees
+ * - Duplicate-name scenarios
+ * - Missing required field validation
+ * - Bulk employee generation
+ *
+ * CLAIM TESTING
+ * - Open claims
+ * - Settled claims
+ * - Under review claims
+ * - Rejected claims
+ * - High-value claims
+ * - Null payout claims
+ * - Invalid date scenarios
+ * - Bulk claim generation
+ *
+ * RELATIONSHIP TESTING
+ * - Employee-to-Claim junction creation
+ * - Multiple claim ownership scenarios
+ * - Risk profile generation
+ *
+ * RISK SCENARIO TESTING
+ * - High-risk employees with many large claims
+ * - Medium-risk employees
+ * - Standard/low-risk employees
+ *
+ * BULK TESTING
+ * - Large employee datasets
+ * - Large claim datasets
+ * - Governor limit validation support
+ *
+ * ---------------------------------------------------------
+ * USAGE EXAMPLES
+ * ---------------------------------------------------------
+ *
+ * Example: Create and insert an open claim
+ *
+ *     Claim__c claim =
+ *         TestDataFactory.createOpenClaim();
+ *
+ *     insert claim;
+ *
+ * Example: Create employee with multiple claims
+ *
+ *     Employee__c emp =
+ *         TestDataFactory.createHighRiskScenario();
+ *
+ * Example: Bulk claim creation
+ *
+ *     List<Claim__c> claims =
+ *         TestDataFactory.createBulkClaims(200, 5000);
+ *
+ * ---------------------------------------------------------
+ * TESTING BEST PRACTICES
+ * ---------------------------------------------------------
+ *
+ * Recommended usage:
+ * - Use helper methods instead of inline record creation
+ * - Keep assertions inside test classes, not factory methods
+ * - Use scenario methods for readability
+ * - Use bulk helpers for governor limit coverage
+ *
+ * Avoid:
+ * - Hardcoding repetitive test data in test classes
+ * - Embedding assertions inside factory methods
+ * - Overloading factory methods with business logic
+ *
+ * ---------------------------------------------------------
+ * NOTES
+ * ---------------------------------------------------------
+ *
+ * - This class is annotated with @IsTest and does not count
+ *   against Apex organization storage limits.
+ *
+ * - Factory methods are static to allow direct access from
+ *   any test class without instantiation.
+ *
+ * - This class is intended strictly for test support and
+ *   should never contain production business logic.
+ *
+ * =========================================================
  */
 
  @IsTest
