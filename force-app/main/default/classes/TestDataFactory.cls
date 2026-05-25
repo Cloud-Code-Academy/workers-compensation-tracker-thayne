@@ -443,7 +443,7 @@ public class TestDataFactory {
     
          public static Employee__c createEmployeeWithMultipleClaims(
             Integer claimCount,
-            Decimal payoutAmount
+            Decimal settlementAmount
         ) {
             Employee__c emp = createEmployee();
             insert emp;
@@ -454,7 +454,7 @@ public class TestDataFactory {
                 claims.add(
                     new Claim__c(
                         Status__c = 'Open',
-                        Settlement_Amount__c = payoutAmount
+                        Settlement_Amount__c = settlementAmount
                     )
                 );
             }
@@ -518,7 +518,7 @@ public class TestDataFactory {
          */
     
         public static Claim__c createClaimWithNullPayout() {
-            // Creates claim without payout amount
+            // Creates claim without settlement amount
             return new Claim__c(Status__c = 'Open');
         }
     
@@ -532,11 +532,102 @@ public class TestDataFactory {
             return new Employee__c(Name = 'Test Employee');
         }
     
-        /*
-         * =========================================================
-         * BULK TEST HELPERS
-         * =========================================================
-         */
+/**
+ * =========================================================
+ * createBulkEmployees
+ * =========================================================
+ *
+ * Creates a bulk collection of Employee__c records for
+ * high-volume Apex testing scenarios.
+ *
+ * This helper supports:
+ * - trigger bulk testing
+ * - governor limit validation
+ * - relationship testing
+ * - large dataset simulation
+ * - scalability verification
+ *
+ * ---------------------------------------------------------
+ * PURPOSE
+ * ---------------------------------------------------------
+ *
+ * Salesforce executes automation in bulk contexts.
+ * This method generates large employee datasets to ensure
+ * Apex logic remains efficient and bulk-safe.
+ *
+ * ---------------------------------------------------------
+ * PARAMETERS
+ * ---------------------------------------------------------
+ *
+ * @param count
+ * The number of Employee__c records to generate.
+ *
+ * Example:
+ *     200
+ *
+ * ---------------------------------------------------------
+ * RETURN VALUE
+ * ---------------------------------------------------------
+ *
+ * @return List<Employee__c>
+ *
+ * Returns a list of NON-INSERTED Employee__c records.
+ *
+ * The calling test controls:
+ * - DML execution
+ * - transaction boundaries
+ * - assertions
+ *
+ * ---------------------------------------------------------
+ * DEFAULT FIELD VALUES
+ * ---------------------------------------------------------
+ *
+ * Each employee is assigned a unique Name value:
+ *
+ *     Bulk Employee 0
+ *     Bulk Employee 1
+ *     Bulk Employee 2
+ *
+ * etc.
+ *
+ * Unique naming helps:
+ * - avoid duplicate confusion
+ * - improve debugging readability
+ * - simplify assertion tracking
+ *
+ * ---------------------------------------------------------
+ * BULKIFICATION
+ * ---------------------------------------------------------
+ *
+ * This method is fully bulkified because:
+ *
+ * - No SOQL queries are executed
+ * - No DML occurs inside loops
+ * - Records are created entirely in memory
+ *
+ * ---------------------------------------------------------
+ * USAGE EXAMPLE
+ * ---------------------------------------------------------
+ *
+ *     List<Employee__c> employees =
+ *         TestDataFactory.createBulkEmployees(200);
+ *
+ *     insert employees;
+ *
+ * ---------------------------------------------------------
+ * WHY THIS METHOD IS IMPORTANT
+ * ---------------------------------------------------------
+ *
+ * Large employee datasets help validate:
+ *
+ * - trigger scalability
+ * - relationship handling
+ * - aggregation logic
+ * - batch-safe processing
+ * - governor limit compliance
+ *
+ * =========================================================
+ */
     
         public static List<Claim__c> createBulkClaims(
             Integer count,
