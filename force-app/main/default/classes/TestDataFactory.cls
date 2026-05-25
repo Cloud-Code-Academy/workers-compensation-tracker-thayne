@@ -224,25 +224,25 @@ public class TestDataFactory {
         }    
 
         public static Claim__c createSettledClaim() {
-            // Creates settled claim with payout and settlement date
+            // Creates settled claim without payout and settlement date
             Claim__c claim = new Claim__c(Status__c = 'Settled', Settlement_Amount__c = 5000, Settlement_Date__c = Date.today());
             return claim;
         }
     
         public static Claim__c createHighValueClaim() {
-            // Creates claim above high-value threshold
+            // Creates claim settlement above high-value threshold
             Claim__c claim = new Claim__c(Status__c = 'Open', Settlement_Amount__c = 10000);
             return claim;
         }
     
         public static Claim__c createMediumRiskClaim() {
-            // Creates moderate payout claim for scoring tests
+            // Creates moderate settlement claim for scoring tests
             Claim__c claim = new Claim__c(Status__c = 'Open', Settlement_Amount__c = 3000);
             return claim;
         }
     
         public static Claim__c createLowRiskClaim() {
-            // Creates small payout claim
+            // Creates small settlement claim
             Claim__c claim = new Claim__c(Status__c = 'Open', Settlement_Amount__c = 500);
             return claim;
         }
@@ -288,7 +288,141 @@ public class TestDataFactory {
             // Links employee to claim
             return new Employee_Claim__c(Employee__c = employeeId, Claim__c = claimId);
         }
-    
+
+
+/**
+ * =========================================================
+ * createEmployeeClaims
+ * =========================================================
+ *
+ * Creates a bulk collection of Employee_Claim__c junction
+ * records that associate Employees with Claims.
+ *
+ * This helper is primarily used for:
+ * - bulk trigger testing
+ * - relationship testing
+ * - many-record scenario setup
+ * - governor limit validation
+ *
+ * ---------------------------------------------------------
+ * PURPOSE
+ * ---------------------------------------------------------
+ *
+ * The Employee_Claim__c object represents a junction
+ * relationship between:
+ *
+ * - Employee__c
+ * - Claim__c
+ *
+ * This method automatically pairs employees and claims
+ * together by list index position.
+ *
+ * Example:
+ *
+ * employees[0] -> claims[0]
+ * employees[1] -> claims[1]
+ * employees[2] -> claims[2]
+ *
+ * ---------------------------------------------------------
+ * PARAMETERS
+ * ---------------------------------------------------------
+ *
+ * @param employees
+ * A list of Employee__c records.
+ *
+ * Expected behavior:
+ * - Records should already be inserted
+ * - IDs must exist for relationship assignment
+ *
+ * @param claims
+ * A list of Claim__c records.
+ *
+ * Expected behavior:
+ * - Records should already be inserted
+ * - IDs must exist for relationship assignment
+ *
+ * ---------------------------------------------------------
+ * RETURN VALUE
+ * ---------------------------------------------------------
+ *
+ * @return List<Employee_Claim__c>
+ *
+ * Returns a list of NON-INSERTED junction records.
+ *
+ * The calling test method is responsible for:
+ * - performing DML
+ * - controlling transaction scope
+ * - validating behavior
+ *
+ * ---------------------------------------------------------
+ * MATCHING LOGIC
+ * ---------------------------------------------------------
+ *
+ * The method iterates using:
+ *
+ *     Math.min(employees.size(), claims.size())
+ *
+ * This prevents index-out-of-bounds exceptions when
+ * the input lists have different sizes.
+ *
+ * Example:
+ *
+ * employees.size() = 5
+ * claims.size()    = 3
+ *
+ * Only 3 junction records will be created.
+ *
+ * ---------------------------------------------------------
+ * BULKIFICATION
+ * ---------------------------------------------------------
+ *
+ * This method is fully bulkified because:
+ *
+ * - No SOQL queries are executed
+ * - No DML operations occur inside loops
+ * - All records are created in memory
+ * - Supports large-volume test setup
+ *
+ * ---------------------------------------------------------
+ * USAGE EXAMPLE
+ * ---------------------------------------------------------
+ *
+ *     List<Employee__c> employees =
+ *         TestDataFactory.createBulkEmployees(5);
+ *
+ *     insert employees;
+ *
+ *     List<Claim__c> claims =
+ *         TestDataFactory.createBulkClaims(5, 1000);
+ *
+ *     insert claims;
+ *
+ *     List<Employee_Claim__c> junctions =
+ *         TestDataFactory.createEmployeeClaims(
+ *             employees,
+ *             claims
+ *         );
+ *
+ *     insert junctions;
+ *
+ * ---------------------------------------------------------
+ * WHY THIS METHOD IS USEFUL
+ * ---------------------------------------------------------
+ *
+ * Without this helper, every test class would need to:
+ *
+ * - manually loop through records
+ * - create junction objects repeatedly
+ * - duplicate setup logic
+ *
+ * Centralizing this logic improves:
+ * - maintainability
+ * - readability
+ * - consistency
+ * - test scalability
+ *
+ * =========================================================
+ */
         public static List<Employee_Claim__c> createEmployeeClaims(
             List<Employee__c> employees,
             List<Claim__c> claims
