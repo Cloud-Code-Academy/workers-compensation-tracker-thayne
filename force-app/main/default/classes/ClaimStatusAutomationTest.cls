@@ -1,23 +1,173 @@
 /**
- * This class contains unit tests for validating the behavior of Apex classes
- * and triggers.
+ * =========================================================
+ * CLAIM STATUS AUTOMATION TEST CLASS
+ * =========================================================
  *
- * Unit tests are class methods that verify whether a particular piece
- * of code is working properly. Unit test methods take no arguments,
- * commit no data to the database, and are flagged with the testMethod
- * keyword in the method definition.
+ * Unit test class for validating automated claim status
+ * behavior, settlement processing rules, and lifecycle
+ * validation logic for Claim__c records.
  *
- * All test methods in an org are executed whenever Apex code is deployed
- * to a production org to confirm correctness, ensure code
- * coverage, and prevent regressions. All Apex classes are
- * required to have at least 75% code coverage in order to be deployed
- * to a production org. In addition, all triggers must have some code coverage.
- * 
- * The @isTest class annotation indicates this class only contains test
- * methods. Classes defined with the @isTest annotation do not count against
- * the org size limit for all Apex scripts.
+ * This class verifies:
  *
- * See the Apex Language Reference for more information about Testing and Code Coverage.
+ * - status transitions
+ * - settlement automation
+ * - required settlement validations
+ * - historical data preservation
+ * - invalid lifecycle transitions
+ * - bulk automation behavior
+ *
+ * ---------------------------------------------------------
+ * BUSINESS PURPOSE
+ * ---------------------------------------------------------
+ *
+ * Claims progress through a controlled lifecycle during
+ * investigation and resolution.
+ *
+ * Typical lifecycle flow:
+ *
+ *     Open
+ *         ↓
+ *     Under Review
+ *         ↓
+ *     Settled / Rejected
+ *
+ * Status transitions may trigger:
+ *
+ * - automatic field population
+ * - financial validations
+ * - settlement tracking
+ * - reporting updates
+ * - audit history preservation
+ *
+ * This test class ensures lifecycle automation behaves
+ * consistently and preserves data integrity.
+ *
+ * ---------------------------------------------------------
+ * AUTOMATION RULES BEING TESTED
+ * ---------------------------------------------------------
+ *
+ * SETTLED CLAIM RULES
+ * - Settlement_Date__c auto-populates
+ * - Settlement_Amount__c is required
+ * - settlement values persist correctly
+ *
+ * UNDER REVIEW RULES
+ * - no settlement date should populate
+ *
+ * REJECTED CLAIM RULES
+ * - rejected claims cannot bypass settlement requirements
+ *
+ * HISTORICAL DATA RULES
+ * - settlement dates remain preserved even if
+ *   status changes later
+ *
+ * ---------------------------------------------------------
+ * TEST COVERAGE AREAS
+ * ---------------------------------------------------------
+ *
+ * This class validates:
+ *
+ * ✔ Open → Under Review transitions
+ * ✔ Settlement date auto-population
+ * ✔ Settlement amount validation
+ * ✔ Invalid settlement transitions
+ * ✔ Historical settlement preservation
+ * ✔ Bulk settlement automation
+ * ✔ Non-settled status behavior
+ *
+ * ---------------------------------------------------------
+ * TEST SETUP STRATEGY
+ * ---------------------------------------------------------
+ *
+ * Shared test data is created using @TestSetup.
+ *
+ * Setup creates:
+ *
+ * - one open Claim__c record
+ *
+ * Benefits include:
+ *
+ * - reduced duplicate setup logic
+ * - faster execution
+ * - cleaner test methods
+ * - reusable baseline data
+ *
+ * ---------------------------------------------------------
+ * SETTLEMENT AUTOMATION BEHAVIOR
+ * ---------------------------------------------------------
+ *
+ * When a claim becomes:
+ *
+ *     Status__c = 'Settled'
+ *
+ * automation is expected to:
+ *
+ * - populate Settlement_Date__c
+ * - validate Settlement_Amount__c
+ * - preserve settlement history
+ *
+ * ---------------------------------------------------------
+ * BULKIFICATION VALIDATION
+ * ---------------------------------------------------------
+ *
+ * Bulk tests ensure automation:
+ *
+ * - processes many records safely
+ * - avoids SOQL-in-loop violations
+ * - avoids DML-in-loop violations
+ * - scales within governor limits
+ *
+ * ---------------------------------------------------------
+ * TESTING STRATEGY
+ * ---------------------------------------------------------
+ *
+ * This class follows Apex testing best practices:
+ *
+ * - isolated test methods
+ * - reusable TestDataFactory helpers
+ * - positive and negative test coverage
+ * - edge-case validation
+ * - bulk processing validation
+ * - lifecycle integrity testing
+ *
+ * ---------------------------------------------------------
+ * DEPENDENCIES
+ * ---------------------------------------------------------
+ *
+ * This class depends on:
+ *
+ * - Claim__c object
+ * - claim status automation
+ * - validation rules/triggers
+ * - settlement automation logic
+ * - TestDataFactory helper methods
+ *
+ * ---------------------------------------------------------
+ * EXPECTED AUTOMATION BEHAVIOR
+ * ---------------------------------------------------------
+ *
+ * The tested automation is expected to:
+ *
+ * - enforce lifecycle rules
+ * - populate settlement fields automatically
+ * - validate settlement requirements
+ * - preserve historical data
+ * - support bulk operations safely
+ *
+ * ---------------------------------------------------------
+ * NOTES
+ * ---------------------------------------------------------
+ *
+ * - This class uses @IsTest and does not count toward
+ *   Apex storage limits.
+ *
+ * - Tests run in isolated execution contexts and do not
+ *   access production data.
+ *
+ * - Assertions validate both business correctness and
+ *   data integrity.
+ *
+ * =========================================================
  */
 @IsTest
 private class ClaimStatusAutomationTest {
