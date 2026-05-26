@@ -1,23 +1,245 @@
 /**
- * This class contains unit tests for validating the behavior of Apex classes
- * and triggers.
+ * =========================================================
+ * EMPLOYEE RISK SCORING TEST CLASS
+ * =========================================================
  *
- * Unit tests are class methods that verify whether a particular piece
- * of code is working properly. Unit test methods take no arguments,
- * commit no data to the database, and are flagged with the testMethod
- * keyword in the method definition.
+ * Unit test class for validating employee risk-scoring
+ * automation and dynamic risk classification behavior.
  *
- * All test methods in an org are executed whenever Apex code is deployed
- * to a production org to confirm correctness, ensure code
- * coverage, and prevent regressions. All Apex classes are
- * required to have at least 75% code coverage in order to be deployed
- * to a production org. In addition, all triggers must have some code coverage.
- * 
- * The @isTest class annotation indicates this class only contains test
- * methods. Classes defined with the @isTest annotation do not count against
- * the org size limit for all Apex scripts.
+ * This class verifies that employee risk levels are
+ * automatically calculated and updated based on:
  *
- * See the Apex Language Reference for more information about Testing and Code Coverage.
+ * - total number of related claims
+ * - cumulative payout exposure
+ * - individual high-value claims
+ * - claim additions and removals
+ *
+ * ---------------------------------------------------------
+ * BUSINESS PURPOSE
+ * ---------------------------------------------------------
+ *
+ * Employee risk scoring is used to identify individuals
+ * with elevated insurance or operational risk exposure.
+ *
+ * Risk classifications support:
+ *
+ * - fraud detection
+ * - compliance review
+ * - insurance analytics
+ * - financial oversight
+ * - operational reporting
+ * - escalation workflows
+ *
+ * Employees are automatically assigned risk levels based
+ * on their related claims and financial impact.
+ *
+ * ---------------------------------------------------------
+ * OBJECT RELATIONSHIPS
+ * ---------------------------------------------------------
+ *
+ * Employee__c
+ *     ↑
+ * Employee_Claim__c (junction object)
+ *     ↓
+ * Claim__c
+ *
+ * Risk calculations aggregate data from related Claim__c
+ * records connected through Employee_Claim__c records.
+ *
+ * ---------------------------------------------------------
+ * RISK LEVELS TESTED
+ * ---------------------------------------------------------
+ *
+ * STANDARD
+ * - minimal claim activity
+ * - low payout exposure
+ *
+ * MEDIUM RISK
+ * - moderate claim activity
+ * - moderate payout exposure
+ *
+ * HIGH
+ * - excessive claim activity
+ * - large settlement exposure
+ * - elevated financial risk
+ *
+ * ---------------------------------------------------------
+ * TEST COVERAGE AREAS
+ * ---------------------------------------------------------
+ *
+ * This class validates:
+ *
+ * ✔ Standard risk classification
+ * ✔ Medium risk classification
+ * ✔ High risk classification
+ * ✔ Single high-value claim escalation
+ * ✔ Claim-volume escalation
+ * ✔ Dynamic risk re-evaluation
+ * ✔ Risk recalculation after updates
+ * ✔ Risk recalculation after deletions
+ *
+ * ---------------------------------------------------------
+ * STANDARD RISK TESTING
+ * ---------------------------------------------------------
+ *
+ * Standard-risk employees are expected to:
+ *
+ * - maintain low claim counts
+ * - maintain low payout totals
+ * - remain classified as 'Standard'
+ *
+ * These tests validate:
+ *
+ * - baseline scoring behavior
+ * - low-risk classification accuracy
+ *
+ * ---------------------------------------------------------
+ * MEDIUM RISK TESTING
+ * ---------------------------------------------------------
+ *
+ * Medium-risk employees represent moderate exposure.
+ *
+ * These tests validate:
+ *
+ * - claim aggregation behavior
+ * - payout aggregation behavior
+ * - medium-level risk escalation
+ *
+ * ---------------------------------------------------------
+ * HIGH RISK TESTING
+ * ---------------------------------------------------------
+ *
+ * High-risk employees are expected when:
+ *
+ * - claim volume becomes excessive
+ * - payout totals become unusually large
+ * - individual claims exceed thresholds
+ *
+ * These tests validate:
+ *
+ * - high-risk escalation logic
+ * - financial exposure calculations
+ * - claim-count escalation logic
+ *
+ * ---------------------------------------------------------
+ * LARGE SETTLEMENT EDGE CASE TESTING
+ * ---------------------------------------------------------
+ *
+ * A single high-value claim may independently trigger
+ * High risk classification.
+ *
+ * These tests validate:
+ *
+ * - single-claim escalation logic
+ * - payout threshold evaluation
+ * - immediate risk recalculation
+ *
+ * ---------------------------------------------------------
+ * CLAIM VOLUME EDGE CASE TESTING
+ * ---------------------------------------------------------
+ *
+ * Multiple low-value claims may collectively increase
+ * employee risk exposure.
+ *
+ * These tests validate:
+ *
+ * - volume-based risk escalation
+ * - cumulative claim analysis
+ * - aggregation integrity
+ *
+ * ---------------------------------------------------------
+ * RISK RE-EVALUATION TESTING
+ * ---------------------------------------------------------
+ *
+ * Employee risk levels must dynamically recalculate when:
+ *
+ * - settlement amounts change
+ * - claims are added
+ * - claims are removed
+ * - payout exposure changes
+ *
+ * These tests validate:
+ *
+ * - automatic recalculation behavior
+ * - trigger/automation responsiveness
+ * - data consistency
+ *
+ * ---------------------------------------------------------
+ * DELETE AUTOMATION TESTING
+ * ---------------------------------------------------------
+ *
+ * Claim relationship deletions should automatically:
+ *
+ * - reduce claim counts
+ * - reduce payout totals
+ * - reevaluate employee risk levels
+ *
+ * ---------------------------------------------------------
+ * BULKIFICATION CONSIDERATIONS
+ * ---------------------------------------------------------
+ *
+ * The tested automation is expected to remain bulk-safe.
+ *
+ * Automation should:
+ *
+ * - avoid SOQL-in-loop violations
+ * - avoid DML-in-loop violations
+ * - support large-volume recalculations
+ * - operate within Salesforce governor limits
+ *
+ * ---------------------------------------------------------
+ * TESTING STRATEGY
+ * ---------------------------------------------------------
+ *
+ * This class follows Apex testing best practices:
+ *
+ * - isolated test methods
+ * - reusable TestDataFactory helpers
+ * - positive and edge-case testing
+ * - aggregation validation
+ * - dynamic recalculation testing
+ * - business-rule-focused assertions
+ *
+ * ---------------------------------------------------------
+ * DEPENDENCIES
+ * ---------------------------------------------------------
+ *
+ * This class depends on:
+ *
+ * - Employee__c object
+ * - Claim__c object
+ * - Employee_Claim__c junction object
+ * - employee risk-scoring automation
+ * - payout rollup automation
+ * - TestDataFactory helper methods
+ *
+ * ---------------------------------------------------------
+ * EXPECTED AUTOMATION BEHAVIOR
+ * ---------------------------------------------------------
+ *
+ * The tested automation is expected to:
+ *
+ * - maintain accurate claim totals
+ * - maintain accurate payout totals
+ * - classify employees correctly
+ * - dynamically recalculate risk
+ * - respond to updates and deletions
+ * - preserve aggregation integrity
+ *
+ * ---------------------------------------------------------
+ * NOTES
+ * ---------------------------------------------------------
+ *
+ * - This class uses @IsTest and does not count against
+ *   Apex organization storage limits.
+ *
+ * - Tests execute in isolated transactions and do not
+ *   access production data.
+ *
+ * - Assertions validate both business correctness and
+ *   automation integrity.
+ *
+ * =========================================================
  */
 @IsTest
 private class EmployeeRiskScoringTest {
