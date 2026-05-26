@@ -1,23 +1,184 @@
 /**
- * This class contains unit tests for validating the behavior of Apex classes
- * and triggers.
+ * =========================================================
+ * CLAIM LIFECYCLE TEST CLASS
+ * =========================================================
  *
- * Unit tests are class methods that verify whether a particular piece
- * of code is working properly. Unit test methods take no arguments,
- * commit no data to the database, and are flagged with the testMethod
- * keyword in the method definition.
+ * Unit test class for validating the complete lifecycle
+ * behavior of Claim__c records and their related employee
+ * financial rollup calculations.
  *
- * All test methods in an org are executed whenever Apex code is deployed
- * to a production org to confirm correctness, ensure code
- * coverage, and prevent regressions. All Apex classes are
- * required to have at least 75% code coverage in order to be deployed
- * to a production org. In addition, all triggers must have some code coverage.
- * 
- * The @isTest class annotation indicates this class only contains test
- * methods. Classes defined with the @isTest annotation do not count against
- * the org size limit for all Apex scripts.
+ * This class verifies:
  *
- * See the Apex Language Reference for more information about Testing and Code Coverage.
+ * - claim status transitions
+ * - settlement processing
+ * - payout tracking
+ * - financial rollup calculations
+ * - rejected claim handling
+ * - bulk lifecycle processing
+ * - relationship integrity
+ *
+ * ---------------------------------------------------------
+ * BUSINESS PURPOSE
+ * ---------------------------------------------------------
+ *
+ * Claims move through multiple lifecycle stages during
+ * processing and investigation.
+ *
+ * Common lifecycle progression:
+ *
+ *     Open
+ *         ↓
+ *     Under Review
+ *         ↓
+ *     Settled / Rejected
+ *
+ * Each transition may trigger:
+ *
+ * - financial calculations
+ * - reporting updates
+ * - employee risk recalculations
+ * - payout rollups
+ * - validation logic
+ * - automation workflows
+ *
+ * ---------------------------------------------------------
+ * TEST COVERAGE AREAS
+ * ---------------------------------------------------------
+ *
+ * This test suite validates:
+ *
+ * ✔ Open → Under Review transitions
+ * ✔ Under Review → Settled transitions
+ * ✔ Settlement amount updates
+ * ✔ Settlement date population
+ * ✔ Employee financial rollups
+ * ✔ Rejected claim handling
+ * ✔ Bulk lifecycle processing
+ * ✔ Junction relationship integrity
+ *
+ * ---------------------------------------------------------
+ * TEST SETUP STRATEGY
+ * ---------------------------------------------------------
+ *
+ * This class uses @TestSetup to create reusable baseline
+ * test data shared across all test methods.
+ *
+ * Shared setup includes:
+ *
+ * - one Employee__c record
+ * - one Claim__c record
+ * - one Employee_Claim__c junction record
+ *
+ * Benefits of @TestSetup:
+ *
+ * - faster test execution
+ * - reduced duplicate setup logic
+ * - cleaner test methods
+ * - improved maintainability
+ *
+ * ---------------------------------------------------------
+ * LIFECYCLE STATES TESTED
+ * ---------------------------------------------------------
+ *
+ * OPEN
+ * - newly created claims
+ * - active investigations
+ *
+ * UNDER REVIEW
+ * - claim currently being evaluated
+ * - pending investigation or approval
+ *
+ * SETTLED
+ * - claim approved and paid
+ * - settlement amount finalized
+ * - settlement date populated
+ *
+ * REJECTED
+ * - claim denied
+ * - no payout issued
+ * - no settlement date allowed
+ *
+ * ---------------------------------------------------------
+ * FINANCIAL ROLLUP VALIDATION
+ * ---------------------------------------------------------
+ *
+ * Employee-level financial summaries are expected to update
+ * automatically when claims settle.
+ *
+ * Tested rollup fields include:
+ *
+ * - Total_Claims__c
+ * - Total_Payout__c
+ *
+ * This ensures related automation correctly aggregates:
+ *
+ * - claim counts
+ * - payout totals
+ * - settlement values
+ *
+ * ---------------------------------------------------------
+ * BULKIFICATION VALIDATION
+ * ---------------------------------------------------------
+ *
+ * Bulk tests ensure lifecycle automation:
+ *
+ * - processes multiple claims correctly
+ * - avoids SOQL-in-loop issues
+ * - avoids DML-in-loop issues
+ * - scales within Salesforce governor limits
+ *
+ * ---------------------------------------------------------
+ * TESTING STRATEGY
+ * ---------------------------------------------------------
+ *
+ * This class follows Apex testing best practices:
+ *
+ * - isolated test methods
+ * - reusable TestDataFactory helpers
+ * - bulk-safe validation
+ * - positive-path lifecycle testing
+ * - financial integrity validation
+ * - relationship validation
+ *
+ * ---------------------------------------------------------
+ * DEPENDENCIES
+ * ---------------------------------------------------------
+ *
+ * This test class depends on:
+ *
+ * - Claim__c object
+ * - Employee__c object
+ * - Employee_Claim__c junction object
+ * - lifecycle automation
+ * - financial rollup automation
+ * - TestDataFactory helper methods
+ *
+ * ---------------------------------------------------------
+ * EXPECTED AUTOMATION BEHAVIOR
+ * ---------------------------------------------------------
+ *
+ * The tested automation is expected to:
+ *
+ * - allow valid lifecycle transitions
+ * - update settlement fields correctly
+ * - maintain relationship integrity
+ * - recalculate employee financial totals
+ * - support bulk operations safely
+ *
+ * ---------------------------------------------------------
+ * NOTES
+ * ---------------------------------------------------------
+ *
+ * - This class uses @IsTest and does not count against
+ *   Apex organization storage limits.
+ *
+ * - Tests execute in isolated transactions and do not
+ *   access production data.
+ *
+ * - Assertions validate both business logic correctness
+ *   and data integrity.
+ *
+ * =========================================================
  */
 @IsTest
 private class ClaimLifecycleTest {
