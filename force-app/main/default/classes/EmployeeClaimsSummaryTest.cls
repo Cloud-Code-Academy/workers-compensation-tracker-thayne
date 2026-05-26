@@ -1,23 +1,183 @@
 /**
- * This class contains unit tests for validating the behavior of Apex classes
- * and triggers.
+ * =========================================================
+ * EMPLOYEE CLAIMS SUMMARY TEST CLASS
+ * =========================================================
  *
- * Unit tests are class methods that verify whether a particular piece
- * of code is working properly. Unit test methods take no arguments,
- * commit no data to the database, and are flagged with the testMethod
- * keyword in the method definition.
+ * Unit test class for validating employee-level claim summary
+ * rollup calculations and aggregation behavior.
  *
- * All test methods in an org are executed whenever Apex code is deployed
- * to a production org to confirm correctness, ensure code
- * coverage, and prevent regressions. All Apex classes are
- * required to have at least 75% code coverage in order to be deployed
- * to a production org. In addition, all triggers must have some code coverage.
- * 
- * The @isTest class annotation indicates this class only contains test
- * methods. Classes defined with the @isTest annotation do not count against
- * the org size limit for all Apex scripts.
+ * This class verifies automation responsible for maintaining:
  *
- * See the Apex Language Reference for more information about Testing and Code Coverage.
+ * - Total_Claims__c
+ * - Total_Payout__c
+ *
+ * on Employee__c records based on related claims connected
+ * through the Employee_Claim__c junction object.
+ *
+ * ---------------------------------------------------------
+ * BUSINESS PURPOSE
+ * ---------------------------------------------------------
+ *
+ * Employees may have multiple associated insurance claims.
+ *
+ * The system maintains summary metrics on Employee__c records
+ * to support:
+ *
+ * - risk analysis
+ * - claims reporting
+ * - financial dashboards
+ * - employee profiling
+ * - payout aggregation
+ * - operational monitoring
+ *
+ * These summaries must automatically update whenever:
+ *
+ * - claims are linked
+ * - payout amounts change
+ * - relationships are removed
+ *
+ * ---------------------------------------------------------
+ * OBJECT RELATIONSHIPS
+ * ---------------------------------------------------------
+ *
+ * Employee__c
+ *     ↑
+ * Employee_Claim__c (junction object)
+ *     ↓
+ * Claim__c
+ *
+ * Employee_Claim__c connects employees to claims and allows
+ * rollup automation to aggregate claim information onto
+ * Employee__c records.
+ *
+ * ---------------------------------------------------------
+ * ROLLUP FIELDS TESTED
+ * ---------------------------------------------------------
+ *
+ * Total_Claims__c
+ * - total number of related claims
+ *
+ * Total_Payout__c
+ * - sum of Settlement_Amount__c values from related claims
+ *
+ * ---------------------------------------------------------
+ * TEST COVERAGE AREAS
+ * ---------------------------------------------------------
+ *
+ * This class validates:
+ *
+ * ✔ Claim rollups during insert operations
+ * ✔ Rollup recalculation after claim updates
+ * ✔ Rollup recalculation after relationship deletion
+ * ✔ Bulk rollup processing
+ * ✔ Financial aggregation accuracy
+ * ✔ Junction relationship integrity
+ *
+ * ---------------------------------------------------------
+ * TEST SETUP STRATEGY
+ * ---------------------------------------------------------
+ *
+ * Shared test data is created using @TestSetup.
+ *
+ * Setup includes:
+ *
+ * - one Employee__c record
+ *
+ * Benefits:
+ *
+ * - reduced duplicate setup logic
+ * - improved execution performance
+ * - consistent baseline data
+ * - cleaner test methods
+ *
+ * ---------------------------------------------------------
+ * INSERT AUTOMATION BEHAVIOR
+ * ---------------------------------------------------------
+ *
+ * When Employee_Claim__c records are inserted:
+ *
+ * - Total_Claims__c should increase
+ * - Total_Payout__c should aggregate claim payouts
+ *
+ * ---------------------------------------------------------
+ * UPDATE AUTOMATION BEHAVIOR
+ * ---------------------------------------------------------
+ *
+ * When Claim__c settlement amounts change:
+ *
+ * - Employee payout totals should recalculate automatically
+ *
+ * ---------------------------------------------------------
+ * DELETE AUTOMATION BEHAVIOR
+ * ---------------------------------------------------------
+ *
+ * When Employee_Claim__c records are deleted:
+ *
+ * - claim totals should decrease
+ * - payout totals should recalculate
+ *
+ * ---------------------------------------------------------
+ * BULKIFICATION VALIDATION
+ * ---------------------------------------------------------
+ *
+ * Bulk tests ensure rollup automation:
+ *
+ * - processes many records correctly
+ * - avoids SOQL-in-loop violations
+ * - avoids DML-in-loop violations
+ * - scales within Salesforce governor limits
+ *
+ * ---------------------------------------------------------
+ * TESTING STRATEGY
+ * ---------------------------------------------------------
+ *
+ * This class follows Apex testing best practices:
+ *
+ * - isolated test methods
+ * - reusable TestDataFactory helpers
+ * - bulk-safe validation
+ * - insert/update/delete lifecycle testing
+ * - business-focused assertions
+ * - aggregation integrity testing
+ *
+ * ---------------------------------------------------------
+ * DEPENDENCIES
+ * ---------------------------------------------------------
+ *
+ * This test class depends on:
+ *
+ * - Employee__c object
+ * - Claim__c object
+ * - Employee_Claim__c junction object
+ * - rollup automation/triggers
+ * - TestDataFactory helper methods
+ *
+ * ---------------------------------------------------------
+ * EXPECTED AUTOMATION BEHAVIOR
+ * ---------------------------------------------------------
+ *
+ * The tested automation is expected to:
+ *
+ * - maintain accurate claim counts
+ * - maintain accurate payout totals
+ * - recalculate values automatically
+ * - preserve aggregation integrity
+ * - support bulk operations safely
+ *
+ * ---------------------------------------------------------
+ * NOTES
+ * ---------------------------------------------------------
+ *
+ * - This class uses @IsTest and does not count against
+ *   Apex organization storage limits.
+ *
+ * - Tests execute in isolated transactions and do not
+ *   access production data.
+ *
+ * - Assertions validate both business correctness and
+ *   data aggregation integrity.
+ *
+ * =========================================================
  */
 @IsTest
 private class EmployeeClaimsSummaryTest {
