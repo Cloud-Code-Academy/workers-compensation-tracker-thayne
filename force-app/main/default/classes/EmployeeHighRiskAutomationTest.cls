@@ -1,14 +1,222 @@
 /**
- * Unit tests for Employee high-risk automation logic.
+ * =========================================================
+ * EMPLOYEE HIGH RISK AUTOMATION TEST CLASS
+ * =========================================================
  *
- * Acceptance Criteria:
- * - Employee is marked High Risk if:
- *      1. Employee has 3 or more claims
- *      OR
- *      2. Employee has a claim greater than $10,000
+ * Unit test class for validating employee high-risk
+ * classification automation and risk recalculation logic.
  *
- * - High_Risk__c is automatically checked and unchecked
- *   based on trigger evaluation.
+ * This class verifies automatic updates to:
+ *
+ * - Risk_Level__c
+ * - Total_Claims__c
+ * - Total_Payout__c
+ *
+ * based on employee claim activity and financial exposure.
+ *
+ * ---------------------------------------------------------
+ * BUSINESS PURPOSE
+ * ---------------------------------------------------------
+ *
+ * Employees with excessive claim activity or unusually
+ * large claims may represent elevated organizational risk.
+ *
+ * The system automatically evaluates employee claim data
+ * and classifies employees as High Risk when predefined
+ * thresholds are exceeded.
+ *
+ * This automation supports:
+ *
+ * - fraud detection
+ * - compliance monitoring
+ * - operational risk analysis
+ * - insurance oversight
+ * - employee claim auditing
+ * - financial exposure tracking
+ *
+ * ---------------------------------------------------------
+ * HIGH-RISK CLASSIFICATION RULES
+ * ---------------------------------------------------------
+ *
+ * An employee is classified as:
+ *
+ *     Risk_Level__c = 'High'
+ *
+ * when either condition is met:
+ *
+ * 1. Employee has 3 or more related claims
+ *
+ * OR
+ *
+ * 2. Employee has at least one claim with
+ *    Settlement_Amount__c > 10,000
+ *
+ * ---------------------------------------------------------
+ * AUTOMATION BEHAVIOR TESTED
+ * ---------------------------------------------------------
+ *
+ * The automation is expected to:
+ *
+ * ✔ Automatically classify employees as High Risk
+ * ✔ Recalculate risk when claims change
+ * ✔ Remove High Risk status when thresholds are no longer met
+ * ✔ Recalculate totals after updates/deletes
+ * ✔ Support bulk-safe processing
+ *
+ * ---------------------------------------------------------
+ * OBJECT RELATIONSHIPS
+ * ---------------------------------------------------------
+ *
+ * Employee__c
+ *     ↑
+ * Employee_Claim__c (junction object)
+ *     ↓
+ * Claim__c
+ *
+ * Employee risk calculations are based on related claims
+ * connected through Employee_Claim__c records.
+ *
+ * ---------------------------------------------------------
+ * TEST COVERAGE AREAS
+ * ---------------------------------------------------------
+ *
+ * This class validates:
+ *
+ * ✔ High-risk classification by claim count
+ * ✔ High-risk classification by large payout amount
+ * ✔ Non-high-risk scenarios
+ * ✔ Automatic risk removal after payout reduction
+ * ✔ Automatic risk removal after claim deletion
+ * ✔ Rollup recalculation integrity
+ *
+ * ---------------------------------------------------------
+ * CLAIM COUNT THRESHOLD TESTING
+ * ---------------------------------------------------------
+ *
+ * Employees should automatically become High Risk when:
+ *
+ *     Total_Claims__c >= 3
+ *
+ * The related tests validate:
+ *
+ * - correct claim counting
+ * - automatic risk escalation
+ * - rollup accuracy
+ *
+ * ---------------------------------------------------------
+ * LARGE CLAIM THRESHOLD TESTING
+ * ---------------------------------------------------------
+ *
+ * Employees should automatically become High Risk when:
+ *
+ *     Settlement_Amount__c > 10,000
+ *
+ * The related tests validate:
+ *
+ * - payout aggregation
+ * - financial threshold evaluation
+ * - automatic risk escalation
+ *
+ * ---------------------------------------------------------
+ * NEGATIVE TESTING
+ * ---------------------------------------------------------
+ *
+ * The class verifies employees are NOT incorrectly marked
+ * as High Risk when thresholds are not met.
+ *
+ * This protects against:
+ *
+ * - false positives
+ * - inaccurate reporting
+ * - unnecessary escalation
+ *
+ * ---------------------------------------------------------
+ * RISK REMOVAL TESTING
+ * ---------------------------------------------------------
+ *
+ * The automation must also REMOVE High Risk status when:
+ *
+ * - payout values decrease
+ * - claims are removed
+ * - thresholds are no longer exceeded
+ *
+ * This ensures risk classifications remain accurate over time.
+ *
+ * ---------------------------------------------------------
+ * DELETE AUTOMATION TESTING
+ * ---------------------------------------------------------
+ *
+ * Claim relationship deletions should trigger:
+ *
+ * - claim count recalculation
+ * - payout recalculation
+ * - risk reevaluation
+ *
+ * ---------------------------------------------------------
+ * BULKIFICATION CONSIDERATIONS
+ * ---------------------------------------------------------
+ *
+ * Although individual scenarios are emphasized,
+ * the automation is expected to remain bulk-safe.
+ *
+ * The tested logic should:
+ *
+ * - avoid SOQL-in-loop violations
+ * - avoid DML-in-loop violations
+ * - support governor-limit-safe recalculations
+ *
+ * ---------------------------------------------------------
+ * TESTING STRATEGY
+ * ---------------------------------------------------------
+ *
+ * This class follows Apex testing best practices:
+ *
+ * - isolated test methods
+ * - reusable TestDataFactory helpers
+ * - positive and negative testing
+ * - lifecycle recalculation testing
+ * - business-rule validation
+ * - aggregation integrity testing
+ *
+ * ---------------------------------------------------------
+ * DEPENDENCIES
+ * ---------------------------------------------------------
+ *
+ * This class depends on:
+ *
+ * - Employee__c object
+ * - Claim__c object
+ * - Employee_Claim__c junction object
+ * - employee risk automation logic
+ * - payout rollup calculations
+ * - TestDataFactory helper methods
+ *
+ * ---------------------------------------------------------
+ * EXPECTED AUTOMATION BEHAVIOR
+ * ---------------------------------------------------------
+ *
+ * The tested automation is expected to:
+ *
+ * - maintain accurate claim counts
+ * - maintain accurate payout totals
+ * - classify employee risk correctly
+ * - automatically reevaluate risk after changes
+ * - preserve data consistency
+ *
+ * ---------------------------------------------------------
+ * NOTES
+ * ---------------------------------------------------------
+ *
+ * - This class uses @IsTest and does not count against
+ *   Apex organization storage limits.
+ *
+ * - Tests execute in isolated transactions and do not
+ *   access production data.
+ *
+ * - Assertions validate both business correctness and
+ *   automation integrity.
+ *
+ * =========================================================
  */
 @IsTest
 private class EmployeeHighRiskAutomationTest {
