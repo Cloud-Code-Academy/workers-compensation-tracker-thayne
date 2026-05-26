@@ -1,23 +1,210 @@
 /**
- * This class contains unit tests for validating the behavior of Apex classes
- * and triggers.
+ * =========================================================
+ * HIGH VALUE CLAIM TEST CLASS
+ * =========================================================
  *
- * Unit tests are class methods that verify whether a particular piece
- * of code is working properly. Unit test methods take no arguments,
- * commit no data to the database, and are flagged with the testMethod
- * keyword in the method definition.
+ * Unit test class for validating high-value claim automation,
+ * threshold evaluation logic, and automatic claim flagging.
  *
- * All test methods in an org are executed whenever Apex code is deployed
- * to a production org to confirm correctness, ensure code
- * coverage, and prevent regressions. All Apex classes are
- * required to have at least 75% code coverage in order to be deployed
- * to a production org. In addition, all triggers must have some code coverage.
- * 
- * The @isTest class annotation indicates this class only contains test
- * methods. Classes defined with the @isTest annotation do not count against
- * the org size limit for all Apex scripts.
+ * This class verifies automatic updates to:
  *
- * See the Apex Language Reference for more information about Testing and Code Coverage.
+ * - High_Value_Claim__c
+ *
+ * based on Settlement_Amount__c values associated with claims.
+ *
+ * ---------------------------------------------------------
+ * BUSINESS PURPOSE
+ * ---------------------------------------------------------
+ *
+ * High-value insurance claims may represent increased:
+ *
+ * - financial exposure
+ * - fraud risk
+ * - compliance concerns
+ * - operational escalation requirements
+ *
+ * The system automatically flags claims that exceed
+ * predefined payout thresholds to support:
+ *
+ * - auditing
+ * - financial reporting
+ * - risk management
+ * - investigation workflows
+ * - management visibility
+ *
+ * ---------------------------------------------------------
+ * HIGH VALUE THRESHOLD RULES
+ * ---------------------------------------------------------
+ *
+ * A claim is automatically flagged when:
+ *
+ *     Settlement_Amount__c >= 5000
+ *
+ * In this scenario:
+ *
+ *     High_Value_Claim__c = true
+ *
+ * Claims below the threshold should remain unflagged.
+ *
+ * ---------------------------------------------------------
+ * TEST COVERAGE AREAS
+ * ---------------------------------------------------------
+ *
+ * This class validates:
+ *
+ * ✔ High-value flagging during insert
+ * ✔ Non-high-value claim behavior
+ * ✔ Exact threshold edge cases
+ * ✔ Below-threshold edge cases
+ * ✔ Flag recalculation during updates
+ * ✔ Automatic flag removal
+ * ✔ Null payout handling
+ * ✔ Bulk claim flagging
+ *
+ * ---------------------------------------------------------
+ * INSERT AUTOMATION TESTING
+ * ---------------------------------------------------------
+ *
+ * When claims are inserted:
+ *
+ * - settlement amounts should evaluate automatically
+ * - qualifying claims should be flagged
+ * - non-qualifying claims should remain unflagged
+ *
+ * ---------------------------------------------------------
+ * EXACT THRESHOLD TESTING
+ * ---------------------------------------------------------
+ *
+ * Claims matching the threshold exactly:
+ *
+ *     Settlement_Amount__c = 5000
+ *
+ * should still be classified as High Value.
+ *
+ * These tests validate:
+ *
+ * - inclusive threshold logic
+ * - boundary-condition correctness
+ *
+ * ---------------------------------------------------------
+ * BELOW THRESHOLD EDGE CASE TESTING
+ * ---------------------------------------------------------
+ *
+ * Claims just below the threshold:
+ *
+ *     Settlement_Amount__c < 5000
+ *
+ * should NOT be flagged.
+ *
+ * These tests validate:
+ *
+ * - proper comparison logic
+ * - false-positive prevention
+ *
+ * ---------------------------------------------------------
+ * UPDATE AUTOMATION TESTING
+ * ---------------------------------------------------------
+ *
+ * Claims may become High Value after updates.
+ *
+ * These tests validate:
+ *
+ * - automatic reevaluation after payout increases
+ * - dynamic flag recalculation
+ * - trigger responsiveness
+ *
+ * ---------------------------------------------------------
+ * FLAG REMOVAL TESTING
+ * ---------------------------------------------------------
+ *
+ * Claims should automatically lose the High Value flag
+ * when payout amounts fall below the threshold.
+ *
+ * These tests validate:
+ *
+ * - automatic flag removal
+ * - recalculation integrity
+ * - data consistency
+ *
+ * ---------------------------------------------------------
+ * NULL VALUE EDGE CASE TESTING
+ * ---------------------------------------------------------
+ *
+ * Claims with:
+ *
+ *     Settlement_Amount__c = null
+ *
+ * should never be flagged as High Value.
+ *
+ * These tests validate:
+ *
+ * - null-safe automation
+ * - defensive logic handling
+ * - prevention of incorrect classifications
+ *
+ * ---------------------------------------------------------
+ * BULKIFICATION VALIDATION
+ * ---------------------------------------------------------
+ *
+ * Bulk tests ensure automation:
+ *
+ * - processes multiple claims correctly
+ * - evaluates thresholds consistently
+ * - avoids SOQL-in-loop violations
+ * - avoids DML-in-loop violations
+ * - remains governor-limit safe
+ *
+ * ---------------------------------------------------------
+ * TESTING STRATEGY
+ * ---------------------------------------------------------
+ *
+ * This class follows Apex testing best practices:
+ *
+ * - isolated test methods
+ * - reusable TestDataFactory helpers
+ * - positive and negative testing
+ * - edge-case validation
+ * - threshold-boundary testing
+ * - bulk-processing validation
+ *
+ * ---------------------------------------------------------
+ * DEPENDENCIES
+ * ---------------------------------------------------------
+ *
+ * This class depends on:
+ *
+ * - Claim__c object
+ * - high-value claim automation logic
+ * - settlement amount evaluation logic
+ * - TestDataFactory helper methods
+ *
+ * ---------------------------------------------------------
+ * EXPECTED AUTOMATION BEHAVIOR
+ * ---------------------------------------------------------
+ *
+ * The tested automation is expected to:
+ *
+ * - evaluate claim payout amounts automatically
+ * - flag qualifying claims correctly
+ * - remove flags when thresholds are no longer met
+ * - handle null values safely
+ * - support bulk operations correctly
+ * - maintain data consistency
+ *
+ * ---------------------------------------------------------
+ * NOTES
+ * ---------------------------------------------------------
+ *
+ * - This class uses @IsTest and does not count against
+ *   Apex organization storage limits.
+ *
+ * - Tests execute in isolated transactions and do not
+ *   access production data.
+ *
+ * - Assertions validate both business correctness and
+ *   automation integrity.
+ *
+ * =========================================================
  */
 @IsTest
 private class HighValueClaimTest {
