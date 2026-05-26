@@ -1,10 +1,198 @@
 /**
- * Unit tests for ClaimTriggerHandler.validateIncidentDate().
+ * =========================================================
+ * INTAKE VALIDATION TEST CLASS
+ * =========================================================
  *
- * Validates:
- * - Claims cannot be saved with future Incident_Date__c values
- * - Valid incident dates are accepted
- * - Bulk validation works correctly
+ * Unit test class for validating Incident Date intake rules
+ * enforced by ClaimTriggerHandler.validateIncidentDate().
+ *
+ * This class ensures claims cannot be created or updated
+ * with invalid future incident dates while still allowing:
+ *
+ * - current dates
+ * - past dates
+ * - null values
+ *
+ * ---------------------------------------------------------
+ * BUSINESS PURPOSE
+ * ---------------------------------------------------------
+ *
+ * Incident dates represent when a claim-related event
+ * actually occurred.
+ *
+ * Preventing future incident dates helps maintain:
+ *
+ * - claim accuracy
+ * - audit integrity
+ * - reporting reliability
+ * - fraud prevention
+ * - chronological consistency
+ *
+ * The validation logic ensures users cannot accidentally
+ * or intentionally enter dates that occur after today.
+ *
+ * ---------------------------------------------------------
+ * VALIDATION RULES
+ * ---------------------------------------------------------
+ *
+ * A claim is considered INVALID when:
+ *
+ *     Incident_Date__c > Date.today()
+ *
+ * In these cases:
+ *
+ * - the record should fail validation
+ * - a DmlException should occur
+ * - the correct validation message should appear
+ *
+ * A claim is considered VALID when:
+ *
+ * - Incident_Date__c = today
+ * - Incident_Date__c is in the past
+ * - Incident_Date__c is null
+ *
+ * ---------------------------------------------------------
+ * TEST COVERAGE AREAS
+ * ---------------------------------------------------------
+ *
+ * This class validates:
+ *
+ * ✔ Future incident date prevention
+ * ✔ Current-date acceptance
+ * ✔ Past-date acceptance
+ * ✔ Null date handling
+ * ✔ Bulk validation behavior
+ * ✔ Update validation enforcement
+ * ✔ Validation message correctness
+ *
+ * ---------------------------------------------------------
+ * FUTURE DATE VALIDATION TESTING
+ * ---------------------------------------------------------
+ *
+ * Tests verify:
+ *
+ * - claims with future dates cannot be inserted
+ * - claims with future dates cannot be updated
+ * - DML operations fail properly
+ * - validation messages are accurate
+ *
+ * These tests confirm trigger enforcement
+ * during both insert and update operations.
+ *
+ * ---------------------------------------------------------
+ * VALID DATE TESTING
+ * ---------------------------------------------------------
+ *
+ * Claims should save successfully when:
+ *
+ * - incident date equals today
+ * - incident date is historical
+ *
+ * These tests validate acceptable
+ * chronological scenarios.
+ *
+ * ---------------------------------------------------------
+ * NULL VALUE TESTING
+ * ---------------------------------------------------------
+ *
+ * Some intake workflows may not yet know
+ * the incident date at record creation time.
+ *
+ * These tests ensure:
+ *
+ * - null values do not trigger errors
+ * - optional intake behavior works correctly
+ * - validation logic is null-safe
+ *
+ * ---------------------------------------------------------
+ * BULKIFICATION VALIDATION
+ * ---------------------------------------------------------
+ *
+ * Bulk tests verify:
+ *
+ * - valid records succeed
+ * - invalid records fail independently
+ * - partial-save behavior works correctly
+ * - trigger logic remains bulk-safe
+ *
+ * Database.insert(records, false) is used
+ * to validate partial success behavior.
+ *
+ * ---------------------------------------------------------
+ * UPDATE VALIDATION TESTING
+ * ---------------------------------------------------------
+ *
+ * Tests verify existing claims cannot later
+ * be modified into invalid future dates.
+ *
+ * This ensures:
+ *
+ * - long-term data integrity
+ * - update safety
+ * - consistent trigger enforcement
+ *
+ * ---------------------------------------------------------
+ * ERROR HANDLING VALIDATION
+ * ---------------------------------------------------------
+ *
+ * Exception handling tests confirm:
+ *
+ * - DmlException is thrown correctly
+ * - validation messaging is user-friendly
+ * - trigger addError() logic executes properly
+ *
+ * ---------------------------------------------------------
+ * TESTING STRATEGY
+ * ---------------------------------------------------------
+ *
+ * This class follows Apex testing best practices:
+ *
+ * - isolated test methods
+ * - reusable TestDataFactory utilities
+ * - positive and negative testing
+ * - edge-case validation
+ * - bulk-processing validation
+ * - exception verification
+ *
+ * ---------------------------------------------------------
+ * DEPENDENCIES
+ * ---------------------------------------------------------
+ *
+ * This class depends on:
+ *
+ * - ClaimTriggerHandler.validateIncidentDate()
+ * - Claim__c object
+ * - Incident_Date__c field
+ * - TestDataFactory helper methods
+ *
+ * ---------------------------------------------------------
+ * EXPECTED AUTOMATION BEHAVIOR
+ * ---------------------------------------------------------
+ *
+ * The tested automation is expected to:
+ *
+ * - reject future incident dates
+ * - allow valid historical dates
+ * - allow current dates
+ * - allow null values
+ * - enforce validation during updates
+ * - process bulk operations safely
+ * - provide meaningful validation messages
+ *
+ * ---------------------------------------------------------
+ * NOTES
+ * ---------------------------------------------------------
+ *
+ * - This class uses @isTest and does not count
+ *   against Apex storage limits.
+ *
+ * - Tests run in isolated transactions and do not
+ *   access production organization data.
+ *
+ * - Assertions validate both technical correctness
+ *   and business-rule enforcement.
+ *
+ * =========================================================
  */
 @isTest
 private class IntakeValidationTest {
