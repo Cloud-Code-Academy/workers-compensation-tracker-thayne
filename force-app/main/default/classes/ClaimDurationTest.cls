@@ -1,23 +1,135 @@
 /**
- * This class contains unit tests for validating the behavior of Apex classes
- * and triggers.
+ * =========================================================
+ * CLAIM DURATION TEST CLASS
+ * =========================================================
  *
- * Unit tests are class methods that verify whether a particular piece
- * of code is working properly. Unit test methods take no arguments,
- * commit no data to the database, and are flagged with the testMethod
- * keyword in the method definition.
+ * Unit test class for validating claim duration calculation
+ * behavior on the Claim__c object.
  *
- * All test methods in an org are executed whenever Apex code is deployed
- * to a production org to confirm correctness, ensure code
- * coverage, and prevent regressions. All Apex classes are
- * required to have at least 75% code coverage in order to be deployed
- * to a production org. In addition, all triggers must have some code coverage.
- * 
- * The @isTest class annotation indicates this class only contains test
- * methods. Classes defined with the @isTest annotation do not count against
- * the org size limit for all Apex scripts.
+ * This test suite verifies that automation correctly calculates:
  *
- * See the Apex Language Reference for more information about Testing and Code Coverage.
+ * - Days_Open__c for active claims
+ * - Days_Open__c for settled claims
+ * - Duration recalculation during updates
+ * - Bulk duration processing
+ * - Date validation rules
+ * - Edge-case settlement scenarios
+ *
+ * ---------------------------------------------------------
+ * BUSINESS PURPOSE
+ * ---------------------------------------------------------
+ *
+ * Claims often require duration tracking to support:
+ *
+ * - SLA monitoring
+ * - operational reporting
+ * - compliance metrics
+ * - claim aging dashboards
+ * - employee risk analysis
+ * - escalation workflows
+ *
+ * The Days_Open__c field represents the total number
+ * of days a claim remained open.
+ *
+ * ---------------------------------------------------------
+ * EXPECTED DURATION LOGIC
+ * ---------------------------------------------------------
+ *
+ * OPEN CLAIMS:
+ *
+ *     Days_Open__c =
+ *         TODAY - Incident_Date__c
+ *
+ * SETTLED CLAIMS:
+ *
+ *     Days_Open__c =
+ *         Settlement_Date__c - Incident_Date__c
+ *
+ * SAME-DAY SETTLEMENT:
+ *
+ *     Days_Open__c = 0
+ *
+ * INVALID DATE RULE:
+ *
+ *     Settlement_Date__c
+ *         cannot occur before
+ *     Incident_Date__c
+ *
+ * ---------------------------------------------------------
+ * TEST COVERAGE AREAS
+ * ---------------------------------------------------------
+ *
+ * This class validates:
+ *
+ * ✔ Open claim duration calculations
+ * ✔ Settled claim duration calculations
+ * ✔ Duration recalculation after updates
+ * ✔ Real-time active duration tracking
+ * ✔ Invalid settlement date validation
+ * ✔ Same-day settlement edge cases
+ * ✔ Bulk duration processing behavior
+ *
+ * ---------------------------------------------------------
+ * BULKIFICATION VALIDATION
+ * ---------------------------------------------------------
+ *
+ * Bulk tests ensure automation:
+ *
+ * - handles multiple records correctly
+ * - avoids SOQL-in-loop violations
+ * - avoids DML-in-loop violations
+ * - scales safely within governor limits
+ *
+ * ---------------------------------------------------------
+ * TESTING STRATEGY
+ * ---------------------------------------------------------
+ *
+ * This class follows Apex testing best practices:
+ *
+ * - Uses isolated test methods
+ * - Uses Test.startTest()/stopTest()
+ * - Uses reusable TestDataFactory helpers
+ * - Separates positive and negative test paths
+ * - Validates both insert and update behavior
+ * - Includes edge-case coverage
+ *
+ * ---------------------------------------------------------
+ * DEPENDENCIES
+ * ---------------------------------------------------------
+ *
+ * This test class depends on:
+ *
+ * - Claim__c object
+ * - Claim trigger automation
+ * - Duration calculation logic
+ * - Validation logic
+ * - TestDataFactory helper methods
+ *
+ * ---------------------------------------------------------
+ * EXPECTED AUTOMATION BEHAVIOR
+ * ---------------------------------------------------------
+ *
+ * The tested automation is expected to:
+ *
+ * - calculate durations automatically
+ * - update durations during status changes
+ * - prevent invalid settlement sequences
+ * - support bulk processing safely
+ *
+ * ---------------------------------------------------------
+ * NOTES
+ * ---------------------------------------------------------
+ *
+ * - This class uses @IsTest and does not count toward
+ *   Apex storage limits.
+ *
+ * - No production data is accessed because tests run
+ *   in isolated execution contexts.
+ *
+ * - Assertions verify both business correctness and
+ *   data integrity.
+ *
+ * =========================================================
  */
 @IsTest
 private class ClaimDurationTest {
