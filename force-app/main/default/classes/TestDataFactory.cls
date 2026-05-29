@@ -441,7 +441,7 @@ public class TestDataFactory {
          * =========================================================
          */
     
-         public static Employee__c createEmployeeWithMultipleClaims(
+        public static Employee__c createEmployeeWithMultipleClaims(
             Integer claimCount,
             Decimal settlementAmount
         ) {
