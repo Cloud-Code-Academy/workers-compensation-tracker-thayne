@@ -17,7 +17,6 @@
     <tabs>Claim__c</tabs>
     <tabs>Employee__c</tabs>
     <uiType>Lightning</uiType>
-    <utilityBar>Workers_Comp_UtilityBar</utilityBar>
     <workspaceConfig>
         <mappings>
             <tab>Claim__c</tab>
