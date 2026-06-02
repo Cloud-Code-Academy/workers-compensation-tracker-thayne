@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Title__c</fullName>
+    <label>Title</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Accountant</fullName>
+                <default>false</default>
+                <label>Accountant</label>
+            </value>
+            <value>
+                <fullName>Account Executive</fullName>
+                <default>false</default>
+                <label>Account Executive</label>
+            </value>
+            <value>
+                <fullName>Assembly Technician</fullName>
+                <default>false</default>
+                <label>Assembly Technician</label>
+            </value>
+            <value>
+                <fullName>CNC Operator</fullName>
+                <default>false</default>
+                <label>CNC Operator</label>
+            </value>
+            <value>
+                <fullName>Electrician</fullName>
+                <default>false</default>
+                <label>Electrician</label>
+            </value>
+            <value>
+                <fullName>Financial Analyst</fullName>
+                <default>false</default>
+                <label>Financial Analyst</label>
+            </value>
+            <value>
+                <fullName>Forklift Operator</fullName>
+                <default>false</default>
+                <label>Forklift Operator</label>
+            </value>
+            <value>
+                <fullName>Grounds Maintenance</fullName>
+                <default>false</default>
+                <label>Grounds Maintenance</label>
+            </value>
+            <value>
+                <fullName>Help Desk Technician</fullName>
+                <default>false</default>
+                <label>Help Desk Technician</label>
+            </value>
+            <value>
+                <fullName>HR Generalist</fullName>
+                <default>false</default>
+                <label>HR Generalist</label>
+            </value>
+            <value>
+                <fullName>HR Manager</fullName>
+                <default>false</default>
+                <label>HR Manager</label>
+            </value>
+            <value>
+                <fullName>HVAC Technician</fullName>
+                <default>false</default>
+                <label>HVAC Technician</label>
+            </value>
+            <value>
+                <fullName>Inside Sales Representative</fullName>
+                <default>false</default>
+                <label>Inside Sales Representative</label>
+            </value>
+            <value>
+                <fullName>Inventory Specialist</fullName>
+                <default>false</default>
+                <label>Inventory Specialist</label>
+            </value>
+            <value>
+                <fullName>Line Supervisor</fullName>
+                <default>false</default>
+                <label>Line Supervisor</label>
+            </value>
+            <value>
+                <fullName>Loader</fullName>
+                <default>false</default>
+                <label>Loader</label>
+            </value>
+            <value>
+                <fullName>Logistics Coordinator</fullName>
+                <default>false</default>
+                <label>Logistics Coordinator</label>
+            </value>
+            <value>
+                <fullName>Machine Operator</fullName>
+                <default>false</default>
+                <label>Machine Operator</label>
+            </value>
+            <value>
+                <fullName>Maintenance Supervisor</fullName>
+                <default>false</default>
+                <label>Maintenance Supervisor</label>
+            </value>
+            <value>
+                <fullName>Maintenance Technician</fullName>
+                <default>false</default>
+                <label>Maintenance Technician</label>
+            </value>
+            <value>
+                <fullName>Network Engineer</fullName>
+                <default>false</default>
+                <label>Network Engineer</label>
+            </value>
+            <value>
+                <fullName>Operations Coordinator</fullName>
+                <default>false</default>
+                <label>Operations Coordinator</label>
+            </value>
+            <value>
+                <fullName>Operations Manager</fullName>
+                <default>false</default>
+                <label>Operations Manager</label>
+            </value>
+            <value>
+                <fullName>Payroll Specialist</fullName>
+                <default>false</default>
+                <label>Payroll Specialist</label>
+            </value>
+            <value>
+                <fullName>Picker/Packer</fullName>
+                <default>false</default>
+                <label>Picker/Packer</label>
+            </value>
+            <value>
+                <fullName>Plumber</fullName>
+                <default>false</default>
+                <label>Plumber</label>
+            </value>
+            <value>
+                <fullName>Process Engineer</fullName>
+                <default>false</default>
+                <label>Process Engineer</label>
+            </value>
+            <value>
+                <fullName>Quality Inspector</fullName>
+                <default>false</default>
+                <label>Quality Inspector</label>
+            </value>
+            <value>
+                <fullName>Receiving Clerk</fullName>
+                <default>false</default>
+                <label>Receiving Clerk</label>
+            </value>
+            <value>
+                <fullName>Recruiter</fullName>
+                <default>false</default>
+                <label>Recruiter</label>
+            </value>
+            <value>
+                <fullName>Safety Officer</fullName>
+                <default>false</default>
+                <label>Safety Officer</label>
+            </value>
+            <value>
+                <fullName>Sales Manager</fullName>
+                <default>false</default>
+                <label>Sales Manager</label>
+            </value>
+            <value>
+                <fullName>Sales Representative</fullName>
+                <default>false</default>
+                <label>Sales Representative</label>
+            </value>
+            <value>
+                <fullName>Shipping Coordinator</fullName>
+                <default>false</default>
+                <label>Shipping Coordinator</label>
+            </value>
+            <value>
+                <fullName>Systems Administrator</fullName>
+                <default>false</default>
+                <label>Systems Administrator</label>
+            </value>
+            <value>
+                <fullName>Warehouse Associate</fullName>
+                <default>false</default>
+                <label>Warehouse Associate</label>
+            </value>
+            <value>
+                <fullName>Warehouse Lead</fullName>
+                <default>false</default>
+                <label>Warehouse Lead</label>
+            </value>
+            <value>
+                <fullName>Welder</fullName>
+                <default>false</default>
+                <label>Welder</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>
