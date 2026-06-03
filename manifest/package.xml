@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Package xmlns="http://soap.sforce.com/2006/04/metadata">
+	<types>
+		<members>Workplace_Claims</members>
+		<name>CustomApplication</name>
+	</types>
+	<types>
+		<members>Account</members>
+		<members>Claim__c</members>
+		<members>Contact</members>
+		<members>Employee_Claim__c</members>
+		<members>Employee__c</members>
+		<name>CustomObject</name>
+	</types>
+	<types>
+		<members>Account_Record_Page</members>
+		<members>Claim_Record_Page</members>
+		<members>Contact_Record_Page</members>
+		<members>Employee_Claim_Record_Page</members>
+		<members>Employee_Record_Page</members>
+		<members>Workplace_Claims_UtilityBar</members>
+		<name>FlexiPage</name>
+	</types>
+	<types>
+		<members>Employee_Claim__c.All</members>
+		<members>Employee__c.All</members>
+		<name>ListView</name>
+	</types>
+	<version>66.0</version>
+</Package>
