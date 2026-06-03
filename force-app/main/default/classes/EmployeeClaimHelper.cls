@@ -60,7 +60,7 @@ public with sharing class EmployeeClaimHelper {
             //If the nested map does not contain the Insurance Provider(String), add in insuranceProvider to the nested Map as key and instantiate a new AggregateData value.
             // else, instantiate the aggregateData and add/update the aggregate values.
             // the values continue to be updated per insurance provider per loop.
-
+            
         //BLOCK E
         //After loop, create list of employees to update risk fields on.
         //Calculate risk level by looping through each employeeId in the map's key values.
@@ -73,36 +73,36 @@ public with sharing class EmployeeClaimHelper {
             // call method to calculate risk level summary
             //add employee to list for update.
 
-public static void EmployeeRiskFlagging(List <Employee_Claim__c> employeeClaims){            
+public static void EmployeeRiskFlagging(List <Employee_Claim__c> employeeClaims){    
+
     Set<Id> employeeIds = generateEmployeeIdsSet(employeeClaims);
-    List <Employee_Claim__c> allEmployeeClaims = [SELECT Id, Employee__c, Claim__c, Claim__r.Insurance_Provider__r.Name, Claim__r.Settlement_Amount__c FROM Employee_Claim__c WHERE Employee__c IN :employeeIds];
-    System.debug('Generate set::: ' + employeeIds);
-    System.debug('Generate employeeClaims List::: ' + allEmployeeClaims);
+    List <Employee_Claim__c> allEmployeeClaims = [SELECT Id, Employee__c, Claim__c, Claim__r.Insurance_Provider__r.Name, Claim__r.Settlement_Amount__c, Claim__r.Status__c FROM Employee_Claim__c WHERE Employee__c IN :employeeIds];
+    System.debug('EmployeeClaimsList::: ' + allEmployeeClaims);
+
 
         Map<Id, Map<String, AggregateData>> employeeTotalsMap = new Map<Id, Map<String, AggregateData>>();                //BLOCK A
         for (Employee_Claim__c ec : allEmployeeClaims) {
 
             Id employeeId = ec.Employee__c;                                                                               //BLOCK B
             String insuranceProvider = ec.Claim__r.Insurance_Provider__r.Name;
-            Decimal settlementAmount; 
+            Decimal settlementAmount = 0; 
 
             // This is a check to ensure that the settlementAmount returns a 0 if not null, to allow for aggregation.
-            if (ec.Claim__r.Settlement_Amount__c != null) {
+            if (ec.Claim__r.Settlement_Amount__c != null && ec.Claim__r.Status__c == 'Settled') {
                 settlementAmount = ec.Claim__r.Settlement_Amount__c;
-            } else {
-                settlementAmount = 0;
             }
 
-System.debug('Current loop: values empId, insuranceProvider, settlementAmount::: ' + employeeId + ', ' + insuranceProvider + ', ' + settlementAmount);
-
+            //puts in the employeeId into the map if it's not already in there.
             if (!employeeTotalsMap.containsKey(employeeId)) {                                                              //BLOCK C
                 employeeTotalsMap.put(employeeId, new Map<String, AggregateData>());
             }
-System.debug('Populated employeeTotalsMap:::: ' + employeeTotalsMap);
-
-
                                                                                                                             
         Map<String,AggregateData> insuranceProviderMap = employeeTotalsMap.get(employeeId);                                //BLOCK D
+        
+            if (insuranceProvider == null) {
+                continue;
+            }
+
             if (!insuranceProviderMap.containsKey(insuranceProvider) && insuranceProvider != null) {
                 insuranceProviderMap.put(insuranceProvider, new AggregateData());
             }
@@ -111,14 +111,17 @@ System.debug('Populated employeeTotalsMap:::: ' + employeeTotalsMap);
             agg.totalClaims++;
             agg.totalSettlement += settlementAmount;
 
-System.debug('Populated map::: ' + insuranceProviderMap);
-System.debug('Updated totalClaims::: ' + agg.totalClaims );
-System.debug('Updated totalSettlement::: ' + agg.totalSettlement );
+            System.debug('employeeclaimMapLooop1:::' + employeeId);
+            System.debug('employeeclaimMapLooop1:::' + insuranceProvider);
+            System.debug('employeeclaimMapLooop1:::' + settlementAmount);
+
         }
-                                                            
+                                                      
         List <Employee__c> employeeUpdate = [SELECT Id, Risk_Level__c, Risk_Level_Summary__c, Total_Claims__c, Total_Settlement_Amount__c       //BLOCK E
         FROM Employee__c WHERE Id IN :employeeTotalsMap.keySet()];
-System.debug(' queried list employeeUpdate ::: ' + employeeUpdate );
+
+            System.debug('employeeUpdateList:::' + employeeUpdate);
+
 
         for (Employee__c emp : employeeUpdate) {
                                                                                                                             
@@ -127,30 +130,26 @@ System.debug(' queried list employeeUpdate ::: ' + employeeUpdate );
                 for (String insuranceProvider : insuranceProviderMap.keySet()) {
                     AggregateData agg = insuranceProviderMap.get(insuranceProvider);
 
+                    System.debug('Insurance Provider and Employee :::' + insuranceProvider + ', ' + emp);
+
                     emp.Risk_Level__c = riskLevelCalculation(agg);
                     emp.Total_Claims__c = agg.totalClaims;
                     emp.Total_Settlement_Amount__c = agg.totalSettlement;
 
-                    //sets the value to blank, so that the helper method updates the summary without a null.
-                    if (emp.Risk_Level_Summary__c == null) {
-                        emp.Risk_Level_Summary__c = '';
-                    }
-                    emp.Risk_Level_Summary__c += riskLevelSummarygeneration(insuranceProvider, agg);
-
-                    System.debug('Employee Risk level updated:: ' + emp.Risk_Level__c);
-                    System.debug('Employee Risk level updated::: ' + emp.Total_Claims__c);
-                    System.debug('Employee Risk level updated:::: ' + emp.Total_Settlement_Amount__c);
-                    System.debug('Employee Risk level updated::::: ' + emp.Risk_Level_Summary__c);
+                    emp.Risk_Level_Summary__c = riskLevelSummarygeneration(insuranceProvider, agg);
+                    System.debug('Risk Level Summary loop:::' + emp.Risk_Level_Summary__c);
+                    
                 }
+            }
+                 System.debug('END:: ' + employeeUpdate);
+        update employeeUpdate;
         }
- System.debug('END:: ' + employeeUpdate);
-        //update employeeUpdate;
-    }
 
+    
 ////////////////////////////////////HELPER METHODS///////////////////////////////////////////
 
 //Context - creates set of EmployeeIds from list.
-// 
+
 Public static Set<Id> generateEmployeeIdsSet (List<Employee_Claim__c> employeeClaims){
     
     Set<Id> employeeIds = new Set<Id>();
@@ -194,10 +193,11 @@ System.debug('HELPER 2: ' + riskLevel);
         risklevelSummary +=
         'Insurance Provider: ' + insuranceProvider + '\n' +
         'Total Claims: ' + agg.totalClaims + '\n' +
-        'Total Settlement: ' + agg.totalSettlement + '\n\n';
+        'Total Settlement: $' + agg.totalSettlement + '\n\n';
 
 System.debug('HELPER 3: ' + risklevelSummary);
         return risklevelSummary;
     }
     
 }
+

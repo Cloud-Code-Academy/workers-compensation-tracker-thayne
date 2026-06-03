@@ -48,7 +48,7 @@ for (Integer i = 6; i < 9; i++) {
         i++;
     }
 
-// FOR SETTLED TO Closed STATUS UPDATE (CLEAN NO ERROR) EXPECTING ERROR
+// FOR SETTLED TO Closed STATUS UPDATE  EXPECTING ERROR
     if (i == 8){
         i++;
     }
@@ -73,7 +73,7 @@ for (Integer i = 6; i < 9; i++) {
         
     }
 
-    // FOR Denied TO Closed STATUS UPDATE (CLEAN NO ERROR) EXPECTING ERROR
+    // FOR Denied TO Closed STATUS UPDATE EXPECTING ERROR
     if (i == 9) {
     Claim__c insertClaim10 = new Claim__c();
     String dateToday = '2026-05-18'; //must be updated to TODAY's date whenever I test
